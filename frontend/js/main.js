@@ -263,12 +263,18 @@ cancelCreateEventBtn.addEventListener('click', () => {
 });
 
 addEventForm.addEventListener('submit', (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault(); 
+
+    let eventTimeValue = document.getElementById('eventTime').value;
+    if (eventTimeValue && eventTimeValue.match(/^\d{2}:\d{2}$/)) {
+        eventTimeValue += ':00';
+    }
+
     const eventData = {
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDescription').value,
         date: document.getElementById('eventDate').value,
-        time: document.getElementById('eventTime').value,
+        time: eventTimeValue,
         location: document.getElementById('eventLocation').value
     };
     createEvent(eventData);
