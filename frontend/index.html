@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+     
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+ 
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="font-poppins antialiased bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 text-gray-800 min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-4 sm:mb-0">EventLab</h1>
+            <nav class="flex flex-wrap justify-center sm:justify-end gap-3">
+                <button id="showRegisterBtn" class="bg-white text-purple-700 font-semibold py-2 px-5 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-md">Register</button>
+                <button id="showLoginBtn" class="bg-white text-purple-700 font-semibold py-2 px-5 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-md">Login</button>
+                <button id="logoutBtn" class="bg-red-500 text-white font-semibold py-2 px-5 rounded-full hover:bg-red-600 transition duration-300 transform hover:scale-105 shadow-md" style="display:none;">Logout</button>
+                <span id="welcomeMessage" class="text-lg font-medium flex items-center bg-white bg-opacity-20 px-4 py-2 rounded-full" style="display:none;"></span>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6 md:p-8 my-8 bg-white shadow-xl rounded-xl border border-gray-200">
+        <section id="authSection" class="mb-10 p-8 border border-purple-200 rounded-lg bg-white shadow-md">
+            <div id="registerForm" class="auth-form max-w-md mx-auto">
+                <h2 class="text-3xl font-bold text-purple-700 text-center mb-8">Register for EventLab</h2>
+                <form id="registerUserForm" class="flex flex-col space-y-5">
+                    <div>
+                        <label for="regUsername" class="block text-gray-700 text-sm font-semibold mb-2">Username:</label>
+                        <input type="text" id="regUsername" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="regEmail" class="block text-gray-700 text-sm font-semibold mb-2">Email:</label>
+                        <input type="email" id="regEmail" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="regPassword" class="block text-gray-700 text-sm font-semibold mb-2">Password:</label>
+                        <input type="password" id="regPassword" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200">
+                    </div>
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">Register</button>
+                </form>
+                <p id="registerMessage" class="message mt-6 p-4 rounded-lg font-semibold text-center hidden"></p>
+            </div>
+
+            <div id="loginForm" class="auth-form max-w-md mx-auto" style="display:none;">
+                <h2 class="text-3xl font-bold text-purple-700 text-center mb-8">Login to EventHub</h2>
+                <form id="loginUserForm" class="flex flex-col space-y-5">
+                    <div>
+                        <label for="logUsername" class="block text-gray-700 text-sm font-semibold mb-2">Username:</label>
+                        <input type="text" id="logUsername" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="logPassword" class="block text-gray-700 text-sm font-semibold mb-2">Password:</label>
+                        <input type="password" id="logPassword" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200">
+                    </div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">Login</button>
+                </form>
+                <p id="loginMessage" class="message mt-6 p-4 rounded-lg font-semibold text-center hidden"></p>
+            </div>
+        </section>
+
+        <section id="eventsSection" class="mb-10 p-8 border border-blue-200 rounded-lg bg-white shadow-md" style="display:none;">
+            <h2 class="text-3xl font-bold text-blue-700 text-center mb-8">Explore Events</h2>
+            <button id="showCreateEventFormBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg mb-8 mx-auto block">Create New Event</button>
+
+            <div id="createEventForm" class="event-form max-w-lg mx-auto p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200" style="display:none;">
+                <h3 class="text-2xl font-bold text-blue-700 text-center mb-6">Host a New Event</h3>
+                <form id="addEventForm" class="flex flex-col space-y-5">
+                    <div>
+                        <label for="eventTitle" class="block text-gray-700 text-sm font-semibold mb-2">Title:</label>
+                        <input type="text" id="eventTitle" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="eventDescription" class="block text-gray-700 text-sm font-semibold mb-2">Description:</label>
+                        <textarea id="eventDescription" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label for="eventDate" class="block text-gray-700 text-sm font-semibold mb-2">Date:</label>
+                            <input type="date" id="eventDate" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="eventTime" class="block text-gray-700 text-sm font-semibold mb-2">Time:</label>
+                            <input type="time" id="eventTime" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="eventLocation" class="block text-gray-700 text-sm font-semibold mb-2">Location:</label>
+                        <input type="text" id="eventLocation" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex-grow">Add Event</button>
+                        <button type="button" id="cancelCreateEventBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex-grow">Cancel</button>
+                    </div>
+                </form>
+                <p id="createEventMessage" class="message mt-6 p-4 rounded-lg font-semibold text-center hidden"></p>
+            </div>
+
+            <div id="eventsList" class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <p class="text-gray-600 text-center col-span-full">Loading events...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center p-6 mt-auto bg-gray-800 text-gray-300 shadow-inner">
+        <p>&copy; 2025 EventHub. All rights reserved.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
