@@ -1,16 +1,12 @@
-// frontend/js/main.js
-
-// API Base URL
 const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
-// --- UI Elements ---
 const authSection = document.getElementById('authSection');
 const registerFormDiv = document.getElementById('registerForm');
 const loginFormDiv = document.getElementById('loginForm');
 const eventsSection = document.getElementById('eventsSection');
 const createEventFormDiv = document.getElementById('createEventForm');
 const editEventFormDiv = document.getElementById('editEventForm');
-const eventsListDiv = document.getElementById('eventsList'); // Parent for dynamically added event cards
+const eventsListDiv = document.getElementById('eventsList');
 
 const showRegisterBtn = document.getElementById('showRegisterBtn');
 const showLoginBtn = document.getElementById('showLoginBtn');
@@ -30,7 +26,6 @@ const loginMessage = document.getElementById('loginMessage');
 const createEventMessage = document.getElementById('createEventMessage');
 const editEventMessage = document.getElementById('editEventMessage');
 
-// Event Creation/Editing Inputs - these correctly use date/time
 const editEventIdInput = document.getElementById('editEventId');
 const editEventTitleInput = document.getElementById('editEventTitle');
 const editEventDescriptionInput = document.getElementById('editEventDescription');
@@ -38,31 +33,19 @@ const editEventDateInput = document.getElementById('editEventDate');
 const editEventTimeInput = document.getElementById('editEventTime');
 const editEventLocationInput = document.getElementById('editEventLocation');
 
-// Search and Filter Elements - these only use keyword and location
 const searchQueryInput = document.getElementById('searchQuery');
 const filterLocationInput = document.getElementById('filterLocation');
 const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 
-// Attendee Modal Elements
 const attendeesModal = document.getElementById('attendeesModal');
 const closeAttendeesModalBtn = document.getElementById('closeAttendeesModalBtn');
 const attendeesModalTitle = document.getElementById('attendeesModalTitle');
 const attendeesListContent = document.getElementById('attendeesListContent');
 
-
-// --- State variables ---
 let currentUserId = null;
 let currentUsername = null;
 
-// --- Helper Functions ---
-
-/**
- * Displays a message on the UI, styling it as success or error.
- * @param {HTMLElement} element - The DOM element to display the message in.
- * @param {string} message - The message text.
- * @param {'success' | 'error'} type - The type of message (for styling).
- */
 function showMessage(element, message, type) {
     element.textContent = message;
     element.className = `message mt-6 p-4 rounded-lg font-semibold text-center ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
@@ -70,12 +53,9 @@ function showMessage(element, message, type) {
     setTimeout(() => {
         element.style.display = 'none';
         element.textContent = '';
-    }, 5000); // Hide after 5 seconds
+    }, 5000);
 }
 
-/**
- * Updates the UI based on whether a user is logged in or not.
- */
 function updateUIAfterAuth() {
     if (currentUserId && currentUsername) {
         authSection.style.display = 'none';
@@ -85,7 +65,7 @@ function updateUIAfterAuth() {
         logoutBtn.style.display = 'inline-block';
         welcomeMessageSpan.textContent = `Welcome, ${currentUsername}!`;
         welcomeMessageSpan.style.display = 'inline-block';
-        fetchEvents(); // Call fetchEvents to load events
+        fetchEvents();
     } else {
         authSection.style.display = 'block';
         eventsSection.style.display = 'none';
@@ -96,34 +76,24 @@ function updateUIAfterAuth() {
         welcomeMessageSpan.textContent = '';
         createEventFormDiv.style.display = 'none';
         editEventFormDiv.style.display = 'none';
-        // When logged out, clear filters and display all events
-        clearFilters(); // Ensure filters are cleared on logout, and clearFilters calls fetchEvents
+        clearFilters();
     }
 }
 
-/**
- * Hides all forms (create and edit event forms).
- */
 function hideAllEventForms() {
     createEventFormDiv.style.display = 'none';
     editEventFormDiv.style.display = 'none';
-    addEventForm.reset(); // Clear create form
-    updateEventForm.reset(); // Clear edit form
+    addEventForm.reset();
+    updateEventForm.reset();
     createEventMessage.style.display = 'none';
     editEventMessage.style.display = 'none';
 }
 
-/**
- * Clears the search and filter input fields and re-fetches all events.
- */
 function clearFilters() {
     searchQueryInput.value = '';
     filterLocationInput.value = '';
-    fetchEvents(); // Re-fetch events with no filters
+    fetchEvents();
 }
-
-
-// --- API Interaction Functions ---
 
 async function registerUser(username, email, password) {
     try {
@@ -175,10 +145,6 @@ async function loginUser(username, password) {
     }
 }
 
-/**
- * Fetches events from the API, applying search and location filters.
- * Also checks if the current user is attending to update button states.
- */
 async function fetchEvents() {
     const query = searchQueryInput.value.trim();
     const location = filterLocationInput.value.trim();
@@ -193,18 +159,16 @@ async function fetchEvents() {
     try {
         const response = await fetch(url);
         const events = await response.json();
-        eventsListDiv.innerHTML = ''; // Clear previous events BEFORE adding new ones
+        eventsListDiv.innerHTML = '';
 
         if (events.length === 0) {
             eventsListDiv.innerHTML = '<p class="text-gray-600 text-center col-span-full">No events found matching your criteria. Try adjusting your filters.</p>';
             return;
         }
 
-        // Fetch attendance status for current user for all displayed events
         const attendingEvents = new Set();
         if (currentUserId) {
             try {
-                // Assuming you have this endpoint to get attended events by user ID
                 const attendanceResponse = await fetch(`${API_BASE_URL}/auth/users/${currentUserId}/attended_events`);
                 if (attendanceResponse.ok) {
                     const attendedData = await attendanceResponse.json();
@@ -229,7 +193,7 @@ async function fetchEvents() {
                     <p class="text-gray-600 mb-3"><strong>Location:</strong> ${event.location || 'N/A'}</p>
                     <p><small class="text-gray-500 text-sm">Created by User ID: ${event.created_by_user_id}</small></p>
                 </div>
-                <div class="mt-4 flex flex-wrap gap-2"> 
+                <div class="mt-4 flex flex-wrap gap-2">
                     ${currentUserId ? `
                         ${isAttending ? `
                             <button class="bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed flex-grow">Attending</button>
@@ -241,7 +205,7 @@ async function fetchEvents() {
                     ${currentUserId == event.created_by_user_id ? `
                         <div class="relative inline-block text-left">
                             <button class="tools-btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-md" data-id="${event.id}">
-                                Tools <span class="ml-1">&#9662;</span> 
+                                Tools <span class="ml-1">&#9662;</span>
                             </button>
                             <div class="tools-dropdown absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                                 <div class="py-1" role="none">
@@ -256,8 +220,6 @@ async function fetchEvents() {
             eventsListDiv.appendChild(eventCard);
         });
 
-        // Event listeners are now handled by delegation below, outside this function.
-
     } catch (error) {
         eventsListDiv.innerHTML = `<p class="message error bg-red-100 text-red-700 text-center col-span-full">Failed to load events: ${error.message}</p>`;
         console.error("Error fetching events:", error);
@@ -265,7 +227,7 @@ async function fetchEvents() {
 }
 
 async function createEvent(eventData) {
-    eventData.user_id = currentUserId; // Attach currentUserId for backend authorization
+    eventData.user_id = currentUserId;
 
     try {
         const response = await fetch(`${API_BASE_URL}/events`, {
@@ -276,8 +238,8 @@ async function createEvent(eventData) {
         const data = await response.json();
         if (response.ok) {
             showMessage(createEventMessage, data.message, 'success');
-            hideAllEventForms(); // Hide form after creation
-            fetchEvents(); // Refresh event list
+            hideAllEventForms();
+            fetchEvents();
         } else {
             showMessage(createEventMessage, data.message || 'Failed to create event', 'error');
         }
@@ -286,12 +248,8 @@ async function createEvent(eventData) {
     }
 }
 
-/**
- * Populates the edit form and displays it.
- * @param {string} eventId - The ID of the event to edit.
- */
 async function showEditEventForm(eventId) {
-    hideAllEventForms(); // Hide any other open forms
+    hideAllEventForms();
     try {
         const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
         const event = await response.json();
@@ -301,9 +259,9 @@ async function showEditEventForm(eventId) {
             editEventTitleInput.value = event.title;
             editEventDescriptionInput.value = event.description || '';
             editEventDateInput.value = event.date;
-            editEventTimeInput.value = event.time ? event.time.substring(0, 5) : ''; // Display HH:MM
+            editEventTimeInput.value = event.time ? event.time.substring(0, 5) : '';
             editEventLocationInput.value = event.location || '';
-            editEventFormDiv.style.display = 'block'; // Show the edit form
+            editEventFormDiv.style.display = 'block';
         } else {
             showMessage(eventsListDiv, event.message || 'Could not fetch event for editing.', 'error');
         }
@@ -312,13 +270,8 @@ async function showEditEventForm(eventId) {
     }
 }
 
-/**
- * Sends a request to update an existing event.
- * @param {string} eventId - The ID of the event to update.
- * @param {object} eventData - Object containing updated event details.
- */
 async function updateEvent(eventId, eventData) {
-    eventData.user_id = currentUserId; // Attach currentUserId for backend authorization
+    eventData.user_id = currentUserId;
 
     try {
         const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
@@ -329,8 +282,8 @@ async function updateEvent(eventId, eventData) {
         const data = await response.json();
         if (response.ok) {
             showMessage(editEventMessage, data.message, 'success');
-            hideAllEventForms(); // Hide form after update
-            fetchEvents(); // Refresh event list
+            hideAllEventForms();
+            fetchEvents();
         } else {
             showMessage(editEventMessage, data.message || 'Failed to update event', 'error');
         }
@@ -339,25 +292,21 @@ async function updateEvent(eventId, eventData) {
     }
 }
 
-/**
- * Sends a request to delete an event.
- * @param {string} eventId - The ID of the event to delete.
- */
 async function deleteEvent(eventId) {
     if (!confirm('Are you sure you want to delete this event?')) {
-        return; // User cancelled
+        return;
     }
 
     try {
         const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: currentUserId }) // Send user_id for authorization
+            body: JSON.stringify({ user_id: currentUserId })
         });
         const data = await response.json();
         if (response.ok) {
             showMessage(eventsListDiv, data.message, 'success');
-            fetchEvents(); // Refresh event list
+            fetchEvents();
         } else {
             showMessage(eventsListDiv, data.message || 'Failed to delete event', 'error');
         }
@@ -366,10 +315,6 @@ async function deleteEvent(eventId) {
     }
 }
 
-/**
- * Sends a request to register the current user for an event.
- * @param {string} eventId - The ID of the event to attend.
- */
 async function attendEvent(eventId) {
     if (!currentUserId) {
         showMessage(eventsListDiv, 'Please log in to register for an event.', 'error');
@@ -385,7 +330,7 @@ async function attendEvent(eventId) {
         const data = await response.json();
         if (response.ok) {
             showMessage(eventsListDiv, data.message, 'success');
-            fetchEvents(); // Refresh event list to update 'Attend' button state
+            fetchEvents();
         } else {
             showMessage(eventsListDiv, data.message || 'Failed to register for event', 'error');
         }
@@ -395,11 +340,6 @@ async function attendEvent(eventId) {
     }
 }
 
-/**
- * Fetches and displays the list of attendees for a given event.
- * @param {string} eventId - The ID of the event.
- * @param {string} eventTitle - The title of the event (for display in modal).
- */
 async function fetchAttendees(eventId, eventTitle) {
     try {
         const response = await fetch(`${API_BASE_URL}/events/${eventId}/attendees`);
@@ -407,7 +347,7 @@ async function fetchAttendees(eventId, eventTitle) {
 
         if (response.ok) {
             attendeesModalTitle.textContent = `Attendees for: ${eventTitle}`;
-            attendeesListContent.innerHTML = ''; // Clear previous content
+            attendeesListContent.innerHTML = '';
 
             if (attendees.length === 0) {
                 attendeesListContent.innerHTML = '<p class="text-gray-600">No one has registered for this event yet.</p>';
@@ -421,7 +361,7 @@ async function fetchAttendees(eventId, eventTitle) {
                 });
                 attendeesListContent.appendChild(ul);
             }
-            attendeesModal.style.display = 'flex'; // Show the modal
+            attendeesModal.style.display = 'flex';
         } else {
             showMessage(eventsListDiv, attendees.message || 'Failed to fetch attendees', 'error');
             console.error("Error fetching attendees:", attendees);
@@ -432,13 +372,9 @@ async function fetchAttendees(eventId, eventTitle) {
     }
 }
 
-
-// --- Event Listeners (using Event Delegation for dynamic buttons) ---
-// Attach a single click listener to the parent 'eventsListDiv'
-// This listener will then determine which specific button within an event card was clicked
 eventsListDiv.addEventListener('click', (e) => {
-    const target = e.target; // The actual element that was clicked
-    const eventId = target.dataset.id; // Get data-id from the clicked button (if it has one)
+    const target = e.target;
+    const eventId = target.dataset.id;
 
     if (target.classList.contains('edit-btn')) {
         showEditEventForm(eventId);
@@ -451,36 +387,29 @@ eventsListDiv.addEventListener('click', (e) => {
     } else if (target.classList.contains('attend-btn')) {
         attendEvent(eventId);
     } else if (target.classList.contains('view-attendees-btn')) {
-        const eventTitle = target.dataset.title; 
+        const eventTitle = target.dataset.title;
         fetchAttendees(eventId, eventTitle);
     } else if (target.classList.contains('tools-btn') || target.closest('.tools-btn')) {
-        // Find the tools button if a child element inside it was clicked
         const toolsButton = target.classList.contains('tools-btn') ? target : target.closest('.tools-btn');
         if (toolsButton) {
-            // Hide any other open dropdowns first
             document.querySelectorAll('.tools-dropdown').forEach(dropdown => {
-                if (dropdown !== toolsButton.nextElementSibling) { // Don't hide the one we're about to show/hide
+                if (dropdown !== toolsButton.nextElementSibling) {
                     dropdown.classList.add('hidden');
                 }
             });
-            // Toggle the visibility of the dropdown next to the clicked tools button
             const dropdown = toolsButton.nextElementSibling;
             if (dropdown && dropdown.classList.contains('tools-dropdown')) {
                 dropdown.classList.toggle('hidden');
             }
         }
     } else {
-        // Clicked outside any of the specific buttons or dropdowns
-        // Hide all open dropdowns
         document.querySelectorAll('.tools-dropdown').forEach(dropdown => {
             dropdown.classList.add('hidden');
         });
     }
 });
 
-// Global click listener to close dropdowns if clicking anywhere outside a dropdown or its toggle button
 document.addEventListener('click', (e) => {
-    // If the click target is NOT a tools button AND it's NOT inside any tools-dropdown
     if (!e.target.classList.contains('tools-btn') && !e.target.closest('.tools-dropdown')) {
         document.querySelectorAll('.tools-dropdown').forEach(dropdown => {
             dropdown.classList.add('hidden');
@@ -488,8 +417,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-
-// Existing static event listeners
 showRegisterBtn.addEventListener('click', () => {
     registerFormDiv.style.display = 'block';
     loginFormDiv.style.display = 'none';
@@ -509,7 +436,7 @@ logoutBtn.addEventListener('click', () => {
     currentUsername = null;
     localStorage.removeItem('user_id');
     localStorage.removeItem('username');
-    updateUIAfterAuth(); // This will clear filters and re-fetch events
+    updateUIAfterAuth();
     showMessage(loginMessage, 'Logged out successfully.', 'success');
 });
 
@@ -529,7 +456,7 @@ loginUserForm.addEventListener('submit', (e) => {
 });
 
 showCreateEventFormBtn.addEventListener('click', () => {
-    hideAllEventForms(); // Hide other forms first
+    hideAllEventForms();
     createEventFormDiv.style.display = 'block';
 });
 
@@ -545,7 +472,7 @@ addEventForm.addEventListener('submit', (e) => {
     e.preventDefault();
     let eventTimeValue = document.getElementById('eventTime').value;
     if (eventTimeValue && eventTimeValue.match(/^\d{2}:\d{2}$/)) {
-        eventTimeValue += ':00'; // Ensure time is HH:MM:SS for backend
+        eventTimeValue += ':00';
     }
     const eventData = {
         title: document.getElementById('eventTitle').value,
@@ -561,7 +488,6 @@ updateEventForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const eventId = editEventIdInput.value;
     let editEventTimeValue = editEventTimeInput.value;
-    // Format time for backend (HH:MM:SS)
     if (editEventTimeValue && editEventTimeValue.match(/^\d{2}:\d{2}$/)) {
         editEventTimeValue += ':00';
     }
@@ -576,24 +502,19 @@ updateEventForm.addEventListener('submit', async (e) => {
     updateEvent(eventId, updatedEventData);
 });
 
-// Event Listeners for Search and Filter buttons
 applyFiltersBtn.addEventListener('click', fetchEvents);
 clearFiltersBtn.addEventListener('click', clearFilters);
 
-// Event Listeners for Attendee Modal
 closeAttendeesModalBtn.addEventListener('click', () => {
-    attendeesModal.style.display = 'none'; // Hide the modal
+    attendeesModal.style.display = 'none';
 });
 
-// Close modal if clicked outside content
 attendeesModal.addEventListener('click', (e) => {
     if (e.target === attendeesModal) {
         attendeesModal.style.display = 'none';
     }
 });
 
-
-// --- Initial Load Logic ---
 document.addEventListener('DOMContentLoaded', () => {
     currentUserId = localStorage.getItem('user_id');
     currentUsername = localStorage.getItem('username');
