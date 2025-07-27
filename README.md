@@ -1,7 +1,3 @@
-Here's a well-structured **README.md** file for your **EventHub** project, formatted for a GitHub repository:
-
----
-
 ```markdown
 # 🎉 EventHub: A Simple Event Management Platform
 
