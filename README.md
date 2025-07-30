@@ -181,13 +181,10 @@ Open your browser and navigate to [http://localhost:8000](http://localhost:8000)
 ## 🚧 Future Enhancements
 
 * 🔐 JWT-based secure authentication
-* 📂 User dashboard (My Events / Attending Events)
 * 📬 Email or in-app reminders
 * 🏷️ Categories and Tags for events
 * 🧑‍💼 User profiles and editable settings
 * 📃 Pagination for event listings
-* ⚛️ Migration to frontend frameworks like **React**, **Vue**, or **Angular**
-* ☁️ Cloud deployment (Heroku/Render for backend, Netlify/Vercel for frontend)
 
 ---
 
